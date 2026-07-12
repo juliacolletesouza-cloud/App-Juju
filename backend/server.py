@@ -30,10 +30,14 @@ def api_state():
 @app.post("/api/event")
 def api_event():
     b = request.get_json(force=True, silent=True) or {}
-    txt = (b.get("texto") or "").strip()
-    if not txt:
-        return jsonify({"ok": False, "erro": "texto vazio"}), 400
-    store.add_event(b.get("date") or date.today().isoformat(), "registro", {"texto": txt})
+    kind = b.get("kind") or "registro"
+    payload = b.get("payload") if isinstance(b.get("payload"), dict) else None
+    if payload is None:
+        txt = (b.get("texto") or "").strip()
+        if not txt:
+            return jsonify({"ok": False, "erro": "conteúdo vazio"}), 400
+        payload = {"texto": txt}
+    store.add_event(b.get("date") or date.today().isoformat(), kind, payload)
     return jsonify({"ok": True})
 
 # ---- Webhook Oura ----

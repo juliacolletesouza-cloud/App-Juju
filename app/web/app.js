@@ -210,6 +210,10 @@ function renderHistoria(){
     else if(t.tipo==="treino"){it.appendChild(el("div","tl-body",`🏃 Treino${t.wtype?` · ${t.wtype}`:""}`));
       const cw=el("div","chips");if(t.dur_min)cw.appendChild(el("span","chip",`${Math.round(t.dur_min)} min`));if(t.kcal)cw.appendChild(el("span","chip",`${Math.round(t.kcal)} kcal`));it.appendChild(cw);}
     else if(t.tipo==="registro"){it.appendChild(el("div","tl-body",`📝 ${t.texto||""}`));}
+    else if(t.tipo==="exame"){it.appendChild(el("div","tl-body",`🩸 Exame · ${t.exame||""} ${t.valor||""} ${t.unidade||""}`));}
+    else if(t.tipo==="refeicao"){it.appendChild(el("div","tl-body",`🍽️ Refeição${t.nota?` · ${t.nota}`:""}`));}
+    else if(t.tipo==="medicacao"){it.appendChild(el("div","tl-body",`💊 ${t.nome||""}${t.dose?` · ${t.dose}`:""}${t.quando?` · ${t.quando}`:""}`));}
+    else if(t.tipo==="habito"){it.appendChild(el("div","tl-body",`🎯 Hábito · ${t.texto||""}`));}
     else{it.appendChild(el("div","tl-body","Noite de sono"));
       const cw=el("div","chips");
       if(t.rhr!=null)cw.appendChild(el("span","chip",`FC rep ${t.rhr}`));
@@ -266,6 +270,12 @@ const ICON={
   report:'<path d="M6 20V10M12 20V4M18 20v-7"/>',
   integ:'<circle cx="9" cy="9" r="5"/><circle cx="15" cy="15" r="5"/>',
   sobre:'<circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/>',
+  sangue:'<path d="M12 3s6 7 6 11a6 6 0 0 1-12 0c0-4 6-11 6-11z"/>',
+  refeicao:'<path d="M5 3v8M8 3v8M5 11h3M6.5 11v10M17 3c-2 0-3 2-3 5s1 4 3 4v9"/>',
+  pilula:'<rect x="3" y="9" width="18" height="6" rx="3"/><path d="M12 9v6"/>',
+  coracao:'<path d="M12 20s-7-4.5-9.5-9C1 8 3 4.5 6.5 4.5c2 0 3.5 1.5 5.5 3 2-1.5 3.5-3 5.5-3C21 4.5 23 8 21.5 11c-2.5 4.5-9.5 9-9.5 9z"/>',
+  ciclo:'<circle cx="12" cy="12" r="8"/><path d="M12 8v4l3 2"/>',
+  plano:'<path d="M9 11l3 3 8-8"/><path d="M20 12v6a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h9"/>',
 };
 function svg(p){return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">${p}</svg>`;}
 
@@ -284,8 +294,17 @@ function buildChrome(){
   const items=[
     {ic:"perfil",lab:"O meu perfil",sub:"resumo dos meus dados",fn:sheetPerfil},
     {ic:"disp",lab:"Os meus dispositivos",sub:"fontes conectadas",fn:sheetDispositivos},
-    {ic:"trend",lab:"Tendências",sub:"FC e HRV nas noites",fn:()=>{toggleDrawer(false);setTab("hoje");}},
-    {ic:"report",lab:"Relatório do Signal Test",sub:"método e limites",fn:sheetRelatorio},
+    {head:"Registrar"},
+    {ic:"sangue",lab:"Exames de sangue",sub:"vira memória, sem diagnóstico",fn:sheetExame},
+    {ic:"refeicao",lab:"Foto da refeição",sub:"memória visual, sem análise",fn:sheetRefeicao},
+    {ic:"pilula",lab:"Medicamentos e suplementos",sub:"efeito fica sob observação",fn:sheetMedicacao},
+    {head:"Painéis"},
+    {ic:"coracao",lab:"Saúde cardiovascular",sub:"sinais e tendências",fn:sheetCardio},
+    {ic:"ciclo",lab:"Ciclo & performance",sub:"covariável, não insight",fn:sheetCiclo},
+    {ic:"trend",lab:"Tendências subclínicas",sub:"desvio, não doença",fn:sheetSubclinico},
+    {ic:"report",lab:"Recomendações práticas",sub:"o que fazer hoje",fn:()=>{toggleDrawer(false);setTab("dicas");}},
+    {head:"Plano"},
+    {ic:"plano",lab:"Plano de novos hábitos",sub:"construir com você",fn:sheetPlano},
     {div:true},
     {ic:"integ",lab:"Integrações",sub:"Oura · Apple Watch",fn:sheetIntegracoes},
     {ic:"sobre",lab:"Sobre o Health Twin",fn:sheetSobre},
@@ -294,6 +313,7 @@ function buildChrome(){
   dr.innerHTML=html;
   items.forEach(it=>{
     if(it.div){dr.appendChild(el("div","drawer-div"));return;}
+    if(it.head){dr.appendChild(el("div","drawer-head",it.head));return;}
     const b=el("button","drawer-item");
     b.innerHTML=`${svg(ICON[it.ic])}<span class="lab">${it.lab}${it.sub?`<small>${it.sub}</small>`:""}</span>`;
     b.onclick=()=>{it.fn();};
@@ -347,6 +367,98 @@ function sheetSobre(){openSheet("Sobre o Health Twin",h=>{
   h.appendChild(el("p",null,"• Só fala quando os dados aguentam; senão, mostra quanto falta."));
   h.appendChild(el("p",null,"• Detecta desvio do seu normal, mas não diagnostica doença. Isso é com o médico."));
 });}
+
+/* ---- ingestão (registra na timeline; NUNCA interpreta) ---- */
+function addEvent(kind,payload){
+  const date=(payload && payload.data) || todayISO();
+  try{fetch("/api/event",{method:"POST",headers:{"Content-Type":"application/json"},
+    body:JSON.stringify({kind,payload,date})}).catch(()=>{});}catch(e){}
+  // otimista: aparece na timeline na hora (demo sem servidor também mostra)
+  STATE.timeline.push(Object.assign({date,tipo:kind},payload));
+}
+function field(host,label,ph,type){
+  const w=el("div");w.style.margin="12px 0 0";
+  w.appendChild(el("label","sheet-lab",label));
+  const i=el("input");i.placeholder=ph||"";if(type)i.type=type;i.className="sheet-inp";
+  w.appendChild(i);host.appendChild(w);return i;
+}
+function saveBtn(host,onSave){
+  const b=el("button","sheet-save","Salvar na minha história");
+  b.onclick=onSave;host.appendChild(b);return b;
+}
+function disclaimer(host,txt){const d=el("p","sheet-disc",txt);host.appendChild(d);}
+
+function sheetExame(){openSheet("Registrar exame de sangue",h=>{
+  const nome=field(h,"Exame","ex.: Ferritina");
+  const val=field(h,"Valor","ex.: 18");
+  const un=field(h,"Unidade","ex.: ng/mL");
+  const dt=field(h,"Data da coleta","",'date');
+  saveBtn(h,()=>{if(!nome.value)return;
+    addEvent("exame",{exame:nome.value,valor:val.value,unidade:un.value,data:dt.value||todayISO()});
+    closeSheet();toast("Exame registrado na sua história.");});
+  disclaimer(h,"Fica como memória e contexto na timeline. O app NÃO interpreta exames clinicamente — isso é com o seu médico. (Regra do projeto.)");
+});}
+function sheetRefeicao(){openSheet("Foto da refeição",h=>{
+  const inp=el("input");inp.type="file";inp.accept="image/*";inp.className="sheet-inp";inp.style.padding="10px";
+  h.appendChild(el("label","sheet-lab","Foto"));h.appendChild(inp);
+  const nota=field(h,"Nota (opcional)","ex.: almoço, salada + frango");
+  saveBtn(h,()=>{const nome=inp.files&&inp.files[0]?inp.files[0].name:"foto";
+    addEvent("refeicao",{arquivo:nome,nota:nota.value});closeSheet();toast("Refeição registrada.");});
+  disclaimer(h,"Vira memória visual na timeline. O app NÃO calcula calorias nem nutrientes — estimar isso de uma foto seria inventar precisão.");
+});}
+function sheetMedicacao(){openSheet("Medicamentos e suplementos",h=>{
+  const nome=field(h,"Nome","ex.: Vitamina D");
+  const dose=field(h,"Dose","ex.: 2000 UI");
+  const quando=field(h,"Quando","ex.: manhã, diário");
+  saveBtn(h,()=>{if(!nome.value)return;
+    addEvent("medicacao",{nome:nome.value,dose:dose.value,quando:quando.value});
+    closeSheet();toast("Registrado na sua história.");});
+  disclaimer(h,"Entra na timeline como contexto. Qualquer EFEITO na sua recuperação fica “sob observação” — só vira achado quando replicar nos seus dados, nunca por suposição.");
+});}
+
+function sheetCardio(){openSheet("Saúde cardiovascular",h=>{
+  const find=n=>{for(const s of STATE.substates)for(const c of s.componentes)if(c.rotulo.toLowerCase().includes(n))return c;return null;};
+  const rhr=find("repouso"),hrv=find("hrv"),resp=find("resp");
+  if(rhr)line(h,"FC de repouso (última noite)",`${rhr.valor} bpm · ${rhr.banda}`);
+  if(hrv)line(h,"HRV noturna",`${hrv.valor} ms · ${hrv.banda}`);
+  if(resp)line(h,"Freq. respiratória",`${resp.valor} rpm · ${resp.banda}`);
+  const t=STATE.trend;if(t){const rr=t.rhr.filter(x=>x!=null);
+    line(h,"FC repouso — faixa nas noites",`${Math.min(...rr)}–${Math.max(...rr)} bpm`);}
+  const a=STATE.anomalia;if(a&&a.titulo)line(h,"Radar de desvio",a.titulo);
+  disclaimer(h,"Painel dos seus sinais cardiovasculares e tendências — NÃO é uma avaliação cardíaca clínica. Sintomas ou dúvidas: procure um cardiologista.");
+});}
+function sheetCiclo(){openSheet("Ciclo & performance",h=>{
+  const ciclos=(STATE.timeline||[]).filter(t=>t.tipo==="ciclo").sort((a,b)=>b.date<a.date?-1:1);
+  if(ciclos.length){ciclos.slice(0,6).forEach(c=>line(h,"Menstruação",fmtDate(c.date)+(c.fim?` – ${fmtDate(c.fim)}`:"")));}
+  else h.appendChild(el("p",null,"Nenhuma data de ciclo registrada ainda."));
+  const cap=(STATE.capacidades||[]).find(c=>c.key==="ciclo");
+  if(cap)h.appendChild(el("p",null,"Efeito do ciclo na sua recuperação: "+(cap.mensagem||"coletando")+"" ));
+  disclaimer(h,"A fase do ciclo entra como COVARIÁVEL de controle (não vira insight). Seus ciclos são irregulares, então o efeito exige as datas reais e mais tempo. Ciclos muito curtos/longos são assunto de médico.");
+});}
+function sheetSubclinico(){openSheet("Tendências subclínicas",h=>{
+  const a=STATE.anomalia;
+  if(a){line(h,"Hoje vs seu normal",a.titulo||"—");
+    if(a.sinais&&a.sinais.length)a.sinais.forEach(s=>line(h,s.rotulo,(s.z?`${s.z>0?'+':''}${s.z}σ`:"fora da faixa")));}
+  const cap=(STATE.capacidades||[]).find(c=>c.key==="anomalia");
+  if(cap&&cap.status!=="pronto")h.appendChild(el("p",null,cap.mensagem));
+  disclaimer(h,"Detecção de DESVIO do seu padrão (ex.: FC/temperatura subindo antes de você sentir) — não é diagnóstico de doença. Fica confiável com baseline maior.");
+});}
+function sheetPlano(){openSheet("Plano de novos hábitos",h=>{
+  h.appendChild(el("p",null,"Vamos construir juntas — <b>um hábito por vez</b>, com desfecho medível. É assim que o loop aprende (e é o diferencial do app)."));
+  const ex=STATE.dicas&&STATE.dicas.experimento;
+  if(ex){const c=el("div","plano-hab");
+    c.innerHTML=`<div class="ph-num">1</div><div><b>${ex.titulo}</b><div class="muted">${ex.acao} — em teste 3 semanas.</div></div>`;
+    h.appendChild(c);}
+  const nome=field(h,"Adicionar um hábito","ex.: 10 min de luz de manhã");
+  saveBtn(h,()=>{if(!nome.value)return;addEvent("habito",{texto:nome.value});
+    closeSheet();toast("Hábito adicionado ao plano.");});
+  disclaimer(h,"Um de cada vez, de propósito: mudar cinco coisas juntas impede saber o que funcionou. Cada hábito vira um pequeno experimento com a sua recuperação como desfecho.");
+});}
+
+function toast(msg){let t=document.querySelector(".toast");if(!t){t=el("div","toast");document.body.appendChild(t);}
+  t.textContent=msg;t.classList.add("show");setTimeout(()=>t.classList.remove("show"),2600);
+  if(TAB==="historia")setTab("historia");}
+function todayISO(){const d=new Date();return d.toISOString().slice(0,10);}
 
 /* ---- util ---- */
 function fmtDate(d){if(!d)return"";const[y,m,day]=d.split("-");const M=["jan","fev","mar","abr","mai","jun","jul","ago","set","out","nov","dez"];return`${+day} ${M[+m-1]} ${y}`;}
