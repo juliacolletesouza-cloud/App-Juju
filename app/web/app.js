@@ -79,6 +79,28 @@ function renderHoje(){
   }
   v.appendChild(hero);
 
+  // radar do normal (deteccao de desvio — NAO diagnostico)
+  const a=STATE.anomalia;
+  if(a && a.status!=="coletando"){
+    const fora=a.status==="fora_do_normal";
+    const c=el("div","card");
+    c.style.borderColor = fora ? "color-mix(in srgb,var(--b2) 45%,var(--line))" : "var(--line)";
+    c.appendChild(el("div","eyebrow","Radar do seu normal"));
+    const head=el("div","action");
+    head.appendChild(el("div","ic", fora?"!":"✓"));
+    head.appendChild(el("div","txt",`<b>${a.titulo}</b>`));
+    c.appendChild(head);
+    if(fora && a.sinais.length){
+      const cw=el("div","chips");
+      a.sinais.forEach(s=>cw.appendChild(el("span","chip",`${s.rotulo}${s.z?` (${s.z>0?'+':''}${s.z}σ)`:""}`)));
+      c.appendChild(cw);
+    }
+    c.appendChild(el("p","muted",a.mensagem));
+    const dz=el("p","muted",a.disclaimer);dz.style.marginTop="6px";dz.style.fontWeight="600";c.appendChild(dz);
+    if(a.provisorio)c.appendChild(el("div","muted","<small>Baseline ainda provisório — fica mais confiável com mais noites.</small>"));
+    v.appendChild(c);
+  }
+
   // sub-estados
   const s=el("div","card");
   s.appendChild(el("div","eyebrow","Estado"));
@@ -121,7 +143,7 @@ function renderHoje(){
   STATE.capacidades.forEach(c=>{
     const row=el("div","cap");
     const pct=Math.round((c.pct||0)*100);
-    if(c.status==="bloqueado"){row.appendChild(el("div","ring","<span>—</span>"));}
+    if(c.status==="bloqueado"||c.status==="limitado"){row.appendChild(el("div","ring","<span>—</span>"));}
     else{const r=el("div","ring",`<span>${pct}%</span>`);r.style.setProperty("--p",pct);row.appendChild(r);}
     const body=el("div","body");
     body.appendChild(el("div","cname",c.nome));

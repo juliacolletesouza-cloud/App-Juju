@@ -102,6 +102,9 @@ h2{font-size:15px;margin:0 0 3px;font-weight:680;letter-spacing:.1px}
 .badge.pronto{background:color-mix(in srgb,var(--b4) 18%,transparent);color:var(--b4)}
 .badge.coletando{background:color-mix(in srgb,var(--accent2) 15%,transparent);color:var(--accent2)}
 .badge.bloqueado{background:color-mix(in srgb,var(--muted) 16%,transparent);color:var(--muted)}
+.badge.limitado{background:color-mix(in srgb,var(--b2) 16%,transparent);color:var(--b2)}
+.badge.fora_do_normal{background:color-mix(in srgb,var(--b2) 18%,transparent);color:var(--b2)}
+.badge.dentro_do_normal{background:color-mix(in srgb,var(--b4) 18%,transparent);color:var(--b4)}
 
 /* obs / hypotheses */
 .obs{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:11px 0;border-top:1px solid var(--line)}

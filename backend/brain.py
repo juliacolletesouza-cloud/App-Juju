@@ -29,10 +29,56 @@ CAPS = [
      "need": 28, "desbloqueia": "o que é normal pra você (janela crônica de 28 dias)"},
     {"key": "recomendacoes", "nome": "Recomendações de recuperação",
      "need": 42, "desbloqueia": "conselhos do dia baseados nas suas associações (allowlist + hold-out)"},
+    {"key": "anomalia", "nome": "Radar do seu normal",
+     "need": 30, "desbloqueia": "detecção confiável de quando algo sai do seu padrão"},
+    {"key": "previsao", "nome": "Projeção do corpo (amanhã)",
+     "need": 60, "nota": "sempre com incerteza; é modelo declarado, nunca previsão certa",
+     "desbloqueia": "uma faixa provável pra amanhã, com margem de erro honesta"},
     {"key": "ciclo", "nome": "Efeito do ciclo na recuperação",
      "need": 90, "nota": "precisa de vários ciclos; os seus são irregulares",
      "desbloqueia": "como a fase do ciclo modula sua HRV (só covariável de controle)"},
 ]
+
+def _median(x):
+    x = sorted(v for v in x if v is not None); k = len(x)
+    return (x[k // 2] if k % 2 else (x[k // 2 - 1] + x[k // 2]) / 2) if x else None
+
+def _anomaly(nights):
+    """"Algo diferente do meu normal?" — desvio robusto vs baseline. NÃO é diagnóstico
+    de doença: só sinaliza que o corpo saiu do padrão. Provisório com baseline curto."""
+    if len(nights) < 10:
+        return {"status": "coletando",
+                "mensagem": "Preciso de mais noites pra saber qual é o seu normal antes de detectar desvios."}
+    prior, hoje = nights[:-1], nights[-1]
+    def rz(key, higher_alert):
+        xs = [p.get(key) for p in prior if p.get(key) is not None]
+        val = hoje.get(key)
+        if len(xs) < 8 or val is None: return None
+        m = _median(xs); mad = (_median([abs(x - m) for x in xs]) or 0) * 1.4826 or 1e-9
+        z = (val - m) / mad
+        return z if higher_alert else -z   # z positivo = direção de alerta
+    sinais = []
+    for key, label, hi in [("rhr", "FC de repouso", True), ("hrv", "HRV", False), ("resp", "Freq. respiratória", True)]:
+        z = rz(key, hi)
+        if z is not None and z >= 2.0:
+            sinais.append({"rotulo": label, "valor": hoje.get(key), "z": round(z, 1)})
+    td = hoje.get("temp_dev")
+    if td is not None and abs(td) >= 0.35:
+        sinais.append({"rotulo": "Temperatura corporal", "valor": td, "z": None})
+    fora = len(sinais)
+    return {
+        "status": "fora_do_normal" if fora else "dentro_do_normal",
+        "n_sinais": fora,
+        "sinais": sinais,
+        "provisorio": len(nights) < 30,
+        "titulo": ("Algo está diferente do seu normal hoje" if fora else "Dentro do seu normal hoje"),
+        "mensagem": ("Vários sinais saíram do seu padrão. Isso tem MUITAS causas possíveis "
+                     "(sono ruim, álcool, estresse, início de resfriado…) — não é diagnóstico. "
+                     "Descanse e, se tiver sintomas, procure um médico."
+                     if fora else
+                     "Seus sinais fisiológicos estão dentro da sua faixa habitual."),
+        "disclaimer": "Detecção de desvio, não de doença. Este app não diagnostica.",
+    }
 
 def _readiness(n_oura, today):
     out = []
@@ -49,12 +95,18 @@ def _readiness(n_oura, today):
                         "eta": eta.strftime("%d/%m"),
                         "mensagem": f"Coletando — faltam ~{faltam} noites. Usando o anel todos os dias, "
                                     f"fica pronto por volta de {eta.strftime('%d/%m')}."})
-    # capacidade bloqueada por dado que o tempo não resolve
+    # capacidades bloqueadas por dado/fonte que o tempo não resolve
     out.append({"key": "janela_natural", "nome": "Janela natural de despertar",
                 "status": "bloqueado", "have": n_oura,
                 "desbloqueia": "seu horário natural de acordar",
                 "mensagem": "Não é questão de tempo: preciso de dias SEM despertador. "
                             "Me marque quais dias você acorda sem alarme e isto destrava."})
+    out.append({"key": "estresse", "nome": "Estresse — em tempo real",
+                "status": "limitado", "have": n_oura,
+                "desbloqueia": "leitura de estresse ao longo do dia",
+                "mensagem": "Tempo real ao vivo é impossível: nem a Oura nem o Apple Watch transmitem "
+                            "continuamente. Dá pra ter estresse RETROSPECTIVO do dia (dados diurnos da "
+                            "Oura via API) — mas o export atual não traz isso. Precisa da conexão automática."})
     return out
 
 def compute(nights, workouts=None, events=None, today=None):
@@ -162,6 +214,7 @@ def compute(nights, workouts=None, events=None, today=None):
         "n_noites": n, "provisorio": n < 20, "noite_ref": last["date"],
         "sem_escalar": True,
         "nota_estado": "Estado por bandas de sub-estado — sem número único. Banda = posição na sua própria distribuição.",
+        "anomalia": _anomaly(nights),
         "substates": substates,
         "trend": trend,
         "proximo_sono": {
