@@ -1,0 +1,4 @@
+# dados pessoais — nao versionar
+twin.db
+__pycache__/
+*.pyc

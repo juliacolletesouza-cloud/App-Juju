@@ -2,22 +2,25 @@
 <html lang="pt-BR">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Health Twin</title>
 <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-<header class="topbar">
-  <div class="brand">Health&nbsp;Twin</div>
+<div class="topbar">
+  <div class="brand"><span class="glyph">◐</span> Health Twin</div>
   <div class="prov" id="prov"></div>
-</header>
+</div>
 
 <main id="view"></main>
 
 <nav class="tabs">
-  <button data-tab="hoje" class="active">Hoje</button>
-  <button data-tab="historia">Minha história</button>
-  <button data-tab="perguntar">Perguntar</button>
+  <button data-tab="hoje" class="active">
+    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>Hoje</button>
+  <button data-tab="historia">
+    <svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h10"/></svg>História</button>
+  <button data-tab="perguntar">
+    <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H8l-4 4V5a2 2 0 0 1 2-2h13a2 2 0 0 1 2 2z"/></svg>Perguntar</button>
 </nav>
 
 <script src="app.js"></script>
