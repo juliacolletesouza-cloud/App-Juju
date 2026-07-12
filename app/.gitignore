@@ -1,2 +1,5 @@
 # estado real (dados de saude derivados) fica local; sample vai versionado
 web/data/twin_state.json
+
+# demo com dados reais embutidos — nao versionar
+web/demo.html
