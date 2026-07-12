@@ -1,63 +1,49 @@
-# contexto.md — TEMPLATE (preencher)
+# contexto.md — dados reais fornecidos por Julia
 
-> Este é um **template**. Todos os campos `<preencher>` são placeholders — não
-> são dados reais e não devem ser tratados como tal. Substitua pelo seu contexto
-> verdadeiro e apague as linhas que não se aplicarem. O que ficar como
-> `<preencher>` será tratado como **faltando** no relatório de cobertura.
-
----
+> Preenchido em 2026-07-12 com o que a Julia forneceu. Campos ainda não
+> fornecidos ficam marcados como **NÃO FORNECIDO** — não são inventados.
 
 ## 1. Rotina por dia da semana
-
-Horários típicos (acordar / dormir / treino / trabalho-estudo). Ex.: "seg–sex
-acordo 6h30 com despertador; sáb–dom sem despertador".
-
-- Segunda:  <preencher>
-- Terça:    <preencher>
-- Quarta:   <preencher>
-- Quinta:   <preencher>
-- Sexta:    <preencher>
-- Sábado:   <preencher>
-- Domingo:  <preencher>
+**NÃO FORNECIDO** (Julia informou que não tem esses dados no momento).
 
 ## 2. Dias sem despertador
-
-(Essencial para a "janela natural observada" do §1/capacidade 3.) Liste os dias
-da semana e/ou datas específicas em que você acorda **sem alarme**.
-
-- <preencher>
+**NÃO FORNECIDO.** → Consequência: a **"janela natural observada de despertar"**
+(capacidade 3) permanece **não estimável**. Não será inventada.
 
 ## 3. Horário que preciso acordar amanhã
+**NÃO FORNECIDO.**
 
-- Data de amanhã: <preencher>
-- Preciso acordar às: <preencher>  (ou "sem despertador")
+## 4. Fase do ciclo — datas de início de menstruação (fornecidas)
 
-## 4. Fase do ciclo — datas de início de menstruação
+| Início | Fim | Fonte |
+|---|---|---|
+| 2025-12-10 | 2025-12-14 | informado |
+| 2025-12-21 | 2025-12-26 | informado ⚠️ |
+| 2026-01-04 | 2026-01-08 | informado |
+| 2026-02-19 | 2026-02-22 | informado |
+| 2026-06-15 | 2026-06-19 | informado (última) |
 
-(Covariável de controle do §5, hipótese 6 — **não** vira insight.) Liste as
-datas de **início** de cada menstruação que cobrir o período dos dados.
+**⚠️ Sinalização de qualidade (NÃO é interpretação clínica):** para a covariável
+H6 (ciclo → HRV) funcionar, os limites do ciclo precisam estar corretos. Os
+intervalos entre INÍCIOS destas datas são atípicos para ciclos:
+- 10/dez → 21/dez = **11 dias**
+- 21/dez → 04/jan = **14 dias**
+- 04/jan → 19/fev = **46 dias**
+- 19/fev → 15/jun = **116 dias**
 
-- <preencher: AAAA-MM-DD>
-- <preencher: AAAA-MM-DD>
-- ...
+As duas de dezembro (10-14 e 21-26) estão a ~11 dias uma da outra — curto demais
+para serem dois ciclos. Provável erro de digitação (uma delas talvez seja de
+outro mês). **Precisa confirmar** antes de usar como covariável. Registrado como
+veio; sinalizado como suspeito.
 
-## 5. Anomalias / eventos (com datas)
+**Cobertura vs. dados fisiológicos:** nenhuma destas datas cai na janela do Apple
+Watch 2024 → H6 continua **não testável no teste retrospectivo**. A de 15-19/jun
+fica logo antes dos dados Oura (que começam 24/jun) → só relevante no go-forward.
 
-Marque intervalos de datas para cada evento — são os confundidores obrigatórios
-do §4 e os "dias anômalos" do critério de coerência do §6.
+## 5. Anomalias / eventos (doença, viagem, prova, treino, medicação)
+**NÃO FORNECIDO.** → Consequência: os confundidores obrigatórios do §4 (doença,
+viagem) permanecem **não aplicados**. As nulas da allowlist continuam
+classificadas como coleta (tipo b/c), não ausência real.
 
-| Tipo | Início (AAAA-MM-DD) | Fim (AAAA-MM-DD) | Observação |
-|---|---|---|---|
-| Doença (gripe, etc.) | <preencher> | <preencher> | <preencher> |
-| Viagem / fuso | <preencher> | <preencher> | <preencher> |
-| Prova / pico de estresse acadêmico | <preencher> | <preencher> | <preencher> |
-| Mudança de rotina de treino | <preencher> | <preencher> | <preencher> |
-| Início/mudança de medicamento | <preencher> | <preencher> | <preencher> |
-| Início/mudança de suplemento | <preencher> | <preencher> | <preencher> |
-
-## 6. Qualquer coisa que eu deveria saber
-
-Texto livre. Álcool com frequência? Trabalho noturno? Mudança de fuso recente?
-Lesão? Qualquer coisa que distorça sono/recuperação.
-
-- <preencher>
+## 6. Observações livres
+**NÃO FORNECIDO.**
