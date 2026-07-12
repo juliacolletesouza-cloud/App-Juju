@@ -1,0 +1,107 @@
+{
+  "janela": "2024-03-05 .. 2024-12-28",
+  "n_dias": 254,
+  "baseline_diag": {
+    "rhr": {
+      "amplitude_baseline": 8.0,
+      "mad_tipico": 4.45,
+      "razao_sinal_ruido": 1.8
+    },
+    "hrv": {
+      "amplitude_baseline": 8.47,
+      "mad_tipico": 8.97,
+      "razao_sinal_ruido": 0.94
+    }
+  },
+  "estado_necessidade_sono_min": 486.2,
+  "sensibilidade": {
+    "taxa_troca_media": 0.623,
+    "pares": {
+      "min_limit vs equal_weight": 0.511,
+      "min_limit vs pca1": 0.669,
+      "min_limit vs mean_two_worst": 0.446,
+      "min_limit vs rules_worst": 0.741,
+      "equal_weight vs pca1": 0.712,
+      "equal_weight vs mean_two_worst": 0.288,
+      "equal_weight vs rules_worst": 0.691,
+      "pca1 vs mean_two_worst": 0.719,
+      "pca1 vs rules_worst": 0.734,
+      "mean_two_worst vs rules_worst": 0.719
+    },
+    "criterio_protocolo": "estavel se < 0.15-0.20"
+  },
+  "associacoes": [
+    {
+      "hip": "H1 horario_dormir -> RHR",
+      "n": 241,
+      "direcao_esperada": "dormir tarde -> RHR maior (pior)",
+      "theil_sen_slope": 0.0,
+      "ic95": [
+        -0.0273,
+        0.0116
+      ],
+      "ic_cruza_zero": true,
+      "p_perm": 1.0,
+      "slope_treino": -0.0062,
+      "slope_holdout": 0.0,
+      "sinal_replica_holdout": false,
+      "REPLICACAO_VALIDA": false,
+      "q_fdr": 1.0
+    },
+    {
+      "hip": "H2 irregularidade_sono -> RHR",
+      "n": 242,
+      "direcao_esperada": "mais irregular -> RHR maior",
+      "theil_sen_slope": -0.0159,
+      "ic95": [
+        -0.0904,
+        0.047
+      ],
+      "ic_cruza_zero": true,
+      "p_perm": 0.4678,
+      "slope_treino": -0.0329,
+      "slope_holdout": -0.0314,
+      "sinal_replica_holdout": true,
+      "REPLICACAO_VALIDA": false,
+      "q_fdr": 1.0
+    },
+    {
+      "hip": "H3 duracao_sono(TIB) -> RHR",
+      "n": 227,
+      "direcao_esperada": "mais sono -> RHR menor (melhor)",
+      "theil_sen_slope": 0.0,
+      "ic95": [
+        -0.0196,
+        0.0096
+      ],
+      "ic_cruza_zero": true,
+      "p_perm": 1.0,
+      "slope_treino": 0.0,
+      "slope_holdout": 0.0,
+      "sinal_replica_holdout": false,
+      "REPLICACAO_VALIDA": false,
+      "q_fdr": 1.0
+    },
+    {
+      "hip": "H4 carga_treino_D-1 -> RHR",
+      "n": 245,
+      "direcao_esperada": "carga maior -> RHR maior 24h",
+      "theil_sen_slope": 0.0,
+      "ic95": [
+        -0.0267,
+        0.0136
+      ],
+      "ic_cruza_zero": true,
+      "p_perm": 1.0,
+      "slope_treino": -0.0066,
+      "slope_holdout": -0.0312,
+      "sinal_replica_holdout": true,
+      "REPLICACAO_VALIDA": false,
+      "q_fdr": 1.0
+    }
+  ],
+  "nao_testaveis": {
+    "H5 treino_noturno -> latencia/eficiencia sono": "NAO TESTAVEL nesta janela: eficiencia/latencia exigem sono estagiado; so 14-15 noites estagiadas em 2024 (tipo b/c: coleta).",
+    "H6 fase_ciclo -> HRV": "NAO TESTAVEL nesta janela: sem datas de menstruacao em 2024 (Apple so tem 9 registros, todos 2026). Aguarda contexto.md (tipo b: coleta)."
+  }
+}
