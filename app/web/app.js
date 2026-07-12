@@ -75,7 +75,7 @@ function renderHoje(){
   hero.appendChild(el("div","synthesis",synthesis()));
   if(STATE.provisorio){
     hero.appendChild(el("div","warn",
-      `<span>⚠️</span><span><b>Leitura provisória</b> — base de ${STATE.n_noites} noites. As bandas mudam a cada noite. Não é diagnóstico.</span>`));
+      `<span>⚠️</span><span><b>Leitura provisória</b> — base de ${STATE.n_noites} noites. As bandas mudam a cada noite.</span>`));
   }
   v.appendChild(hero);
 
@@ -96,7 +96,6 @@ function renderHoje(){
       c.appendChild(cw);
     }
     c.appendChild(el("p","muted",a.mensagem));
-    const dz=el("p","muted",a.disclaimer);dz.style.marginTop="6px";dz.style.fontWeight="600";c.appendChild(dz);
     if(a.provisorio)c.appendChild(el("div","muted","<small>Baseline ainda provisório — fica mais confiável com mais noites.</small>"));
     v.appendChild(c);
   }
@@ -210,7 +209,8 @@ function renderHistoria(){
     else if(t.tipo==="treino"){it.appendChild(el("div","tl-body",`🏃 Treino${t.wtype?` · ${t.wtype}`:""}`));
       const cw=el("div","chips");if(t.dur_min)cw.appendChild(el("span","chip",`${Math.round(t.dur_min)} min`));if(t.kcal)cw.appendChild(el("span","chip",`${Math.round(t.kcal)} kcal`));it.appendChild(cw);}
     else if(t.tipo==="registro"){it.appendChild(el("div","tl-body",`📝 ${t.texto||""}`));}
-    else if(t.tipo==="exame"){it.appendChild(el("div","tl-body",`🩸 Exame · ${t.exame||""} ${t.valor||""} ${t.unidade||""}`));}
+    else if(t.tipo==="exame"){it.appendChild(el("div","tl-body",`🩸 Exame${t.rotulo?` · ${t.rotulo}`:""}`));
+      if(t.documento){const cw=el("div","chips");cw.appendChild(el("span","chip",`📄 ${t.documento}`));it.appendChild(cw);}}
     else if(t.tipo==="refeicao"){it.appendChild(el("div","tl-body",`🍽️ Refeição${t.nota?` · ${t.nota}`:""}`));}
     else if(t.tipo==="medicacao"){it.appendChild(el("div","tl-body",`💊 ${t.nome||""}${t.dose?` · ${t.dose}`:""}${t.quando?` · ${t.quando}`:""}`));}
     else if(t.tipo==="habito"){it.appendChild(el("div","tl-body",`🎯 Hábito · ${t.texto||""}`));}
@@ -292,16 +292,16 @@ function buildChrome(){
   const scrim=el("div","scrim");scrim.onclick=()=>toggleDrawer(false);document.body.appendChild(scrim);
   const dr=el("div","drawer");
   const items=[
-    {ic:"perfil",lab:"O meu perfil",sub:"resumo dos meus dados",fn:sheetPerfil},
-    {ic:"disp",lab:"Os meus dispositivos",sub:"fontes conectadas",fn:sheetDispositivos},
+    {ic:"perfil",lab:"Perfil e conta",sub:"minhas informações",fn:sheetPerfil},
+    {ic:"disp",lab:"Emparelhar dispositivos",sub:"Oura · Apple Watch",fn:sheetDispositivos},
     {head:"Registrar"},
-    {ic:"sangue",lab:"Exames de sangue",sub:"vira memória, sem diagnóstico",fn:sheetExame},
-    {ic:"refeicao",lab:"Foto da refeição",sub:"memória visual, sem análise",fn:sheetRefeicao},
-    {ic:"pilula",lab:"Medicamentos e suplementos",sub:"efeito fica sob observação",fn:sheetMedicacao},
+    {ic:"sangue",lab:"Exames de sangue",sub:"anexar documento",fn:sheetExame},
+    {ic:"refeicao",lab:"Foto da refeição",sub:"memória visual",fn:sheetRefeicao},
+    {ic:"pilula",lab:"Medicamentos e suplementos",sub:"o que eu tomo",fn:sheetMedicacao},
     {head:"Painéis"},
     {ic:"coracao",lab:"Saúde cardiovascular",sub:"sinais e tendências",fn:sheetCardio},
-    {ic:"ciclo",lab:"Ciclo & performance",sub:"covariável, não insight",fn:sheetCiclo},
-    {ic:"trend",lab:"Tendências subclínicas",sub:"desvio, não doença",fn:sheetSubclinico},
+    {ic:"ciclo",lab:"Ciclo & performance",sub:"fases e recuperação",fn:sheetCiclo},
+    {ic:"trend",lab:"Tendências subclínicas",sub:"desvios do seu normal",fn:sheetSubclinico},
     {ic:"report",lab:"Recomendações práticas",sub:"o que fazer hoje",fn:()=>{toggleDrawer(false);setTab("dicas");}},
     {head:"Plano"},
     {ic:"plano",lab:"Plano de novos hábitos",sub:"construir com você",fn:sheetPlano},
@@ -337,19 +337,40 @@ function closeSheet(){document.querySelector(".sheet").classList.remove("open");
   document.querySelector(".sheet-scrim").classList.remove("open");}
 function line(host,k,v){const l=el("div","line");l.appendChild(el("div","k",k));l.appendChild(el("div","v",v));host.appendChild(l);}
 
-function sheetPerfil(){openSheet("O meu perfil",h=>{
-  const f=STATE.fontes||{};
-  line(h,"Noite de referência",fmtDate(STATE.noite_ref));
+function prof(){try{return JSON.parse(localStorage.getItem("htwin_perfil")||"{}");}catch(e){return {};}}
+function sheetPerfil(){openSheet("Perfil e conta",h=>{
+  const p=prof();
+  h.appendChild(el("div","sec-title","Informações pessoais"));
+  const nome=field(h,"Nome",""); nome.value=p.nome||"";
+  const nasc=field(h,"Data de nascimento","",'date'); nasc.value=p.nasc||"";
+  const alt=field(h,"Altura (cm)","",'number'); alt.value=p.alt||"";
+  const peso=field(h,"Peso (kg)","",'number'); peso.value=p.peso||"";
+  h.appendChild(el("div","sec-title","Conta"));
+  const email=field(h,"E-mail","",'email'); email.value=p.email||"";
+  line(h,"Plano","Health Twin · pessoal");
+  saveBtn(h,()=>{localStorage.setItem("htwin_perfil",JSON.stringify(
+    {nome:nome.value,nasc:nasc.value,alt:alt.value,peso:peso.value,email:email.value}));
+    closeSheet();toast("Perfil salvo.");},"Salvar perfil");
+  h.appendChild(el("div","sec-title","Meus dados"));
   line(h,"Noites analisadas",STATE.n_noites);
-  Object.entries(f).forEach(([k,v])=>line(h,k,v));
-  line(h,"Leitura",STATE.provisorio?"provisória":"consolidada");
-  h.appendChild(el("p",null,"n=1: tudo aqui é sobre você, não serve de regra pra outras pessoas."));
+  Object.entries(STATE.fontes||{}).forEach(([k,v])=>line(h,k,v));
 });}
-function sheetDispositivos(){openSheet("Os meus dispositivos",h=>{
-  line(h,"Oura","recuperação e sono · primária");
-  line(h,"Apple Watch","treino ("+((STATE.fontes||{})["Apple Watch (treino)"]||0)+" registros)");
-  h.appendChild(el("p",null,"Hoje os dados entram por export. A conexão automática (Oura via API) é o próximo passo — aí o app atualiza sozinho após cada sincronização do anel."));
+
+function sheetDispositivos(){openSheet("Emparelhar dispositivos",h=>{
+  h.appendChild(el("p","sub","Conecte seus aparelhos para os dados entrarem sozinhos."));
+  devRow(h,"disp","Oura Ring","recuperação, sono, HRV, temperatura","conectado");
+  devRow(h,"coracao","Apple Watch","treino e atividade","conectado");
+  devRow(h,"pilula","Balança / outros","peso e composição","emparelhar");
+  h.appendChild(el("p",null,"A conexão em tempo quase real (Oura via API) é o próximo passo: depois de emparelhar, o app atualiza sozinho após cada sincronização do anel."));
 });}
+function devRow(host,ic,nome,desc,estado){
+  const r=el("div","dev");
+  r.innerHTML=`<div class="dev-ic">${svg(ICON[ic])}</div>
+    <div class="dev-body"><div class="dev-nome">${nome}</div><div class="dev-desc">${desc}</div></div>`;
+  const btn=el("button","dev-btn "+(estado==="conectado"?"on":""),estado==="conectado"?"conectado":"emparelhar");
+  btn.onclick=()=>{ if(estado!=="conectado") toast("Emparelhamento automático entra com a conexão via API — próximo passo."); };
+  r.appendChild(btn);host.appendChild(r);
+}
 function sheetRelatorio(){openSheet("Relatório do Signal Test",h=>{
   (STATE.limitacoes||[]).forEach(l=>{const p=el("p",null,"• "+l);p.style.margin="8px 0 0";h.appendChild(p);});
   h.appendChild(el("p",null,"Nenhuma hipótese replicou ainda (base curta) — por isso as recomendações aparecem como “coletando”, não como fato. O método completo está no repositório."));
@@ -382,21 +403,23 @@ function field(host,label,ph,type){
   const i=el("input");i.placeholder=ph||"";if(type)i.type=type;i.className="sheet-inp";
   w.appendChild(i);host.appendChild(w);return i;
 }
-function saveBtn(host,onSave){
-  const b=el("button","sheet-save","Salvar na minha história");
+function saveBtn(host,onSave,label){
+  const b=el("button","sheet-save",label||"Salvar na minha história");
   b.onclick=onSave;host.appendChild(b);return b;
 }
-function disclaimer(host,txt){const d=el("p","sheet-disc",txt);host.appendChild(d);}
+// A honestidade fica no COMPORTAMENTO (o app não interpreta), não em repetir aviso.
+function disclaimer(host,txt){/* intencionalmente sem texto — ver "Sobre" para os princípios */}
 
-function sheetExame(){openSheet("Registrar exame de sangue",h=>{
-  const nome=field(h,"Exame","ex.: Ferritina");
-  const val=field(h,"Valor","ex.: 18");
-  const un=field(h,"Unidade","ex.: ng/mL");
-  const dt=field(h,"Data da coleta","",'date');
-  saveBtn(h,()=>{if(!nome.value)return;
-    addEvent("exame",{exame:nome.value,valor:val.value,unidade:un.value,data:dt.value||todayISO()});
-    closeSheet();toast("Exame registrado na sua história.");});
-  disclaimer(h,"Fica como memória e contexto na timeline. O app NÃO interpreta exames clinicamente — isso é com o seu médico. (Regra do projeto.)");
+function sheetExame(){openSheet("Adicionar exame de sangue",h=>{
+  h.appendChild(el("p","sub","Anexe o documento inteiro (PDF ou foto) — não precisa digitar exame por exame."));
+  const inp=el("input");inp.type="file";inp.accept="application/pdf,image/*";inp.className="sheet-inp";inp.style.padding="10px";
+  h.appendChild(el("label","sheet-lab","Documento do exame"));h.appendChild(inp);
+  const lab=field(h,"Rótulo (opcional)","ex.: hemograma completo");
+  const dt=field(h,"Data do exame","",'date');
+  saveBtn(h,()=>{const arq=inp.files&&inp.files[0]?inp.files[0].name:null;
+    if(!arq){toast("Escolha o documento do exame.");return;}
+    addEvent("exame",{documento:arq,rotulo:lab.value,data:dt.value||todayISO()});
+    closeSheet();toast("Exame anexado à sua história.");});
 });}
 function sheetRefeicao(){openSheet("Foto da refeição",h=>{
   const inp=el("input");inp.type="file";inp.accept="image/*";inp.className="sheet-inp";inp.style.padding="10px";
