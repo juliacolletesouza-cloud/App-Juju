@@ -1,0 +1,313 @@
+{
+  "gerado_em": "2026-07-12 15:32",
+  "fonte_primaria": "Oura",
+  "n_noites": 16,
+  "provisorio": true,
+  "noite_ref": "2026-01-16",
+  "sem_escalar": true,
+  "nota_estado": "Estado por bandas de sub-estado (sem número único). Banda = posição na sua própria distribuição.",
+  "substates": [
+    {
+      "nome": "Recuperação autonômica",
+      "componentes": [
+        {
+          "rotulo": "HRV noturna",
+          "valor": 47.0,
+          "unidade": "ms",
+          "fonte": "Oura",
+          "banda": "moderada-alta",
+          "pct": 0.69
+        },
+        {
+          "rotulo": "FC de repouso",
+          "valor": 65.0,
+          "unidade": "bpm",
+          "fonte": "Oura",
+          "banda": "moderada",
+          "pct": 0.25
+        }
+      ]
+    },
+    {
+      "nome": "Suficiência de sono",
+      "componentes": [
+        {
+          "rotulo": "Duração",
+          "valor": 7.66,
+          "unidade": "h",
+          "fonte": "Oura",
+          "banda": "moderada-alta",
+          "pct": 0.69
+        },
+        {
+          "rotulo": "Eficiência",
+          "valor": 89.0,
+          "unidade": "%",
+          "fonte": "Oura",
+          "banda": "moderada",
+          "pct": 0.44
+        }
+      ]
+    },
+    {
+      "nome": "Contexto respiratório",
+      "componentes": [
+        {
+          "rotulo": "Freq. respiratória",
+          "valor": 14.19,
+          "unidade": "rpm",
+          "fonte": "Oura",
+          "banda": "moderada",
+          "pct": 0.44
+        }
+      ]
+    }
+  ],
+  "timeline": [
+    {
+      "date": "2025-12-10",
+      "evento": "início de menstruação",
+      "fim": "2025-12-14",
+      "tipo": "ciclo"
+    },
+    {
+      "date": "2025-12-21",
+      "evento": "início de menstruação",
+      "fim": "2025-12-26",
+      "tipo": "ciclo"
+    },
+    {
+      "date": "2026-01-01",
+      "hrv": 44.0,
+      "rhr": 59.2,
+      "dur_h": 6.62,
+      "eff": 89.0,
+      "bedtime": "23:00",
+      "wake": "07:15",
+      "temp_dev": -0.17
+    },
+    {
+      "date": "2026-01-02",
+      "hrv": 42.0,
+      "rhr": 58.7,
+      "dur_h": 6.91,
+      "eff": 89.0,
+      "bedtime": "23:01",
+      "wake": "07:15",
+      "temp_dev": 0.08
+    },
+    {
+      "date": "2026-01-03",
+      "hrv": 51.0,
+      "rhr": 62.7,
+      "dur_h": 7.5,
+      "eff": 83.0,
+      "bedtime": "23:02",
+      "wake": "07:15",
+      "temp_dev": 0.08
+    },
+    {
+      "date": "2026-01-04",
+      "hrv": 44.0,
+      "rhr": 59.2,
+      "dur_h": 7.02,
+      "eff": 93.0,
+      "bedtime": "23:03",
+      "wake": "07:15",
+      "temp_dev": 0.09
+    },
+    {
+      "date": "2026-01-04",
+      "evento": "início de menstruação",
+      "fim": "2026-01-08",
+      "tipo": "ciclo"
+    },
+    {
+      "date": "2026-01-05",
+      "hrv": 45.0,
+      "rhr": 62.4,
+      "dur_h": 6.6,
+      "eff": 85.0,
+      "bedtime": "23:04",
+      "wake": "07:15",
+      "temp_dev": 0.01
+    },
+    {
+      "date": "2026-01-06",
+      "hrv": 47.0,
+      "rhr": 65.4,
+      "dur_h": 6.92,
+      "eff": 84.0,
+      "bedtime": "23:05",
+      "wake": "07:15",
+      "temp_dev": -0.16
+    },
+    {
+      "date": "2026-01-07",
+      "hrv": 49.0,
+      "rhr": 65.0,
+      "dur_h": 6.99,
+      "eff": 95.0,
+      "bedtime": "23:00",
+      "wake": "07:15",
+      "temp_dev": 0.01
+    },
+    {
+      "date": "2026-01-08",
+      "hrv": 41.0,
+      "rhr": 61.9,
+      "dur_h": 7.64,
+      "eff": 92.0,
+      "bedtime": "23:01",
+      "wake": "07:15",
+      "temp_dev": 0.24
+    },
+    {
+      "date": "2026-01-09",
+      "hrv": 45.0,
+      "rhr": 60.8,
+      "dur_h": 7.85,
+      "eff": 83.0,
+      "bedtime": "23:02",
+      "wake": "07:15",
+      "temp_dev": -0.07
+    },
+    {
+      "date": "2026-01-10",
+      "hrv": 39.0,
+      "rhr": 63.6,
+      "dur_h": 8.19,
+      "eff": 93.0,
+      "bedtime": "23:03",
+      "wake": "07:15",
+      "temp_dev": -0.01
+    },
+    {
+      "date": "2026-01-11",
+      "hrv": 38.0,
+      "rhr": 61.7,
+      "dur_h": 6.7,
+      "eff": 83.0,
+      "bedtime": "23:04",
+      "wake": "07:15",
+      "temp_dev": -0.14
+    },
+    {
+      "date": "2026-01-12",
+      "hrv": 46.0,
+      "rhr": 65.3,
+      "dur_h": 6.78,
+      "eff": 87.0,
+      "bedtime": "23:05",
+      "wake": "07:15",
+      "temp_dev": -0.13
+    },
+    {
+      "date": "2026-01-13",
+      "hrv": 55.0,
+      "rhr": 60.2,
+      "dur_h": 7.11,
+      "eff": 93.0,
+      "bedtime": "23:00",
+      "wake": "07:15",
+      "temp_dev": -0.12
+    },
+    {
+      "date": "2026-01-14",
+      "hrv": 41.0,
+      "rhr": 63.3,
+      "dur_h": 7.91,
+      "eff": 84.0,
+      "bedtime": "23:01",
+      "wake": "07:15",
+      "temp_dev": -0.13
+    },
+    {
+      "date": "2026-01-15",
+      "hrv": 45.0,
+      "rhr": 62.5,
+      "dur_h": 7.67,
+      "eff": 89.0,
+      "bedtime": "23:02",
+      "wake": "07:15",
+      "temp_dev": 0.14
+    },
+    {
+      "date": "2026-01-16",
+      "hrv": 47.0,
+      "rhr": 65.0,
+      "dur_h": 7.66,
+      "eff": 89.0,
+      "bedtime": "23:03",
+      "wake": "07:15",
+      "temp_dev": -0.0
+    },
+    {
+      "date": "2026-02-19",
+      "evento": "início de menstruação",
+      "fim": "2026-02-22",
+      "tipo": "ciclo"
+    },
+    {
+      "date": "2026-06-15",
+      "evento": "início de menstruação",
+      "fim": "2026-06-19",
+      "tipo": "ciclo"
+    }
+  ],
+  "proximo_sono": {
+    "janela_realista": {
+      "mediana": "22:59",
+      "inicio": "22:44",
+      "fim": "23:15"
+    },
+    "janela_natural": null,
+    "janela_natural_motivo": "Exige dias sem despertador (não fornecidos). Não estimável ainda.",
+    "regularidade_midsleep_min": 18.0
+  },
+  "acoes_hoje": [
+    {
+      "texto": "Coletar: rodar a âncora de horário de dormir (23:00–23:30).",
+      "porque": "Com n=16 noites, o cérebro ainda não tem base para recomendar com confiança. A ação honesta de hoje é coletar, não prescrever."
+    }
+  ],
+  "hipoteses": [
+    {
+      "nome": "Horário de dormir → recuperação",
+      "status": "sob observação",
+      "detalhe": "n=241, IC cruza zero"
+    },
+    {
+      "nome": "Regularidade do sono → recuperação",
+      "status": "sob observação",
+      "detalhe": "n=242, IC cruza zero"
+    },
+    {
+      "nome": "Duração do sono → recuperação",
+      "status": "sob observação",
+      "detalhe": "n=227, IC cruza zero"
+    },
+    {
+      "nome": "Carga de treino → recuperação",
+      "status": "sob observação",
+      "detalhe": "n=245, IC cruza zero"
+    },
+    {
+      "nome": "Treino noturno → sono",
+      "status": "sob observação",
+      "detalhe": "sono estagiado insuficiente"
+    },
+    {
+      "nome": "Fase do ciclo → HRV",
+      "status": "sob observação",
+      "detalhe": "covariável de controle; ciclos irregulares"
+    }
+  ],
+  "limitacoes": [
+    "n=1 não generaliza.",
+    "Base de bandas = 16 noites (Oura). PROVISÓRIO.",
+    "Janela natural de despertar não estimável (faltam dias sem despertador).",
+    "Confundidores (doença, viagem) não aplicados.",
+    "Sem interpretação clínica. Ciclos irregulares são assunto de médico, não deste app."
+  ]
+}
