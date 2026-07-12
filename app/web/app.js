@@ -258,6 +258,96 @@ function answer(q){
   return `Só respondo com os seus dados. Tente: “meu HRV”, “como dormi”, “FC de repouso”, “janela de dormir”. Conselho clínico é com médico — este app não interpreta.`;
 }
 
+/* ---- MENU LATERAL (drawer estilo Oura) + folhas ---- */
+const ICON={
+  perfil:'<circle cx="12" cy="8" r="4"/><path d="M5 20a7 7 0 0 1 14 0"/>',
+  disp:'<circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3"/>',
+  trend:'<path d="M4 16l5-5 3 3 6-7"/><path d="M15 7h4v4"/>',
+  report:'<path d="M6 20V10M12 20V4M18 20v-7"/>',
+  integ:'<circle cx="9" cy="9" r="5"/><circle cx="15" cy="15" r="5"/>',
+  sobre:'<circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/>',
+};
+function svg(p){return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">${p}</svg>`;}
+
+function buildChrome(){
+  const bar=document.querySelector(".topbar");
+  if(bar && !bar.querySelector(".hamb")){
+    const h=el("button","hamb");h.setAttribute("aria-label","Menu");
+    h.innerHTML=svg('<path d="M4 7h16M4 12h16M4 17h16"/>');
+    h.onclick=()=>toggleDrawer(true);
+    const left=el("div","left");const brand=bar.querySelector(".brand");
+    bar.insertBefore(left,bar.firstChild);left.appendChild(h);left.appendChild(brand);
+  }
+  if(document.querySelector(".drawer"))return;
+  const scrim=el("div","scrim");scrim.onclick=()=>toggleDrawer(false);document.body.appendChild(scrim);
+  const dr=el("div","drawer");
+  const items=[
+    {ic:"perfil",lab:"O meu perfil",sub:"resumo dos meus dados",fn:sheetPerfil},
+    {ic:"disp",lab:"Os meus dispositivos",sub:"fontes conectadas",fn:sheetDispositivos},
+    {ic:"trend",lab:"Tendências",sub:"FC e HRV nas noites",fn:()=>{toggleDrawer(false);setTab("hoje");}},
+    {ic:"report",lab:"Relatório do Signal Test",sub:"método e limites",fn:sheetRelatorio},
+    {div:true},
+    {ic:"integ",lab:"Integrações",sub:"Oura · Apple Watch",fn:sheetIntegracoes},
+    {ic:"sobre",lab:"Sobre o Health Twin",fn:sheetSobre},
+  ];
+  let html=`<div class="wordmark"><span class="macron">HEALTH</span> TWIN</div>`;
+  dr.innerHTML=html;
+  items.forEach(it=>{
+    if(it.div){dr.appendChild(el("div","drawer-div"));return;}
+    const b=el("button","drawer-item");
+    b.innerHTML=`${svg(ICON[it.ic])}<span class="lab">${it.lab}${it.sub?`<small>${it.sub}</small>`:""}</span>`;
+    b.onclick=()=>{it.fn();};
+    dr.appendChild(b);
+  });
+  document.body.appendChild(dr);
+  // sheet host
+  const ss=el("div","sheet-scrim");ss.onclick=()=>closeSheet();document.body.appendChild(ss);
+  const sh=el("div","sheet");document.body.appendChild(sh);
+}
+function toggleDrawer(open){document.querySelector(".drawer").classList.toggle("open",open);
+  document.querySelector(".scrim").classList.toggle("open",open);}
+function openSheet(title,builder){
+  toggleDrawer(false);
+  const sh=document.querySelector(".sheet");sh.innerHTML="";
+  sh.appendChild(el("div","grip"));sh.appendChild(el("h3",null,title));
+  builder(sh);
+  document.querySelector(".sheet-scrim").classList.add("open");sh.classList.add("open");
+}
+function closeSheet(){document.querySelector(".sheet").classList.remove("open");
+  document.querySelector(".sheet-scrim").classList.remove("open");}
+function line(host,k,v){const l=el("div","line");l.appendChild(el("div","k",k));l.appendChild(el("div","v",v));host.appendChild(l);}
+
+function sheetPerfil(){openSheet("O meu perfil",h=>{
+  const f=STATE.fontes||{};
+  line(h,"Noite de referência",fmtDate(STATE.noite_ref));
+  line(h,"Noites analisadas",STATE.n_noites);
+  Object.entries(f).forEach(([k,v])=>line(h,k,v));
+  line(h,"Leitura",STATE.provisorio?"provisória":"consolidada");
+  h.appendChild(el("p",null,"n=1: tudo aqui é sobre você, não serve de regra pra outras pessoas."));
+});}
+function sheetDispositivos(){openSheet("Os meus dispositivos",h=>{
+  line(h,"Oura","recuperação e sono · primária");
+  line(h,"Apple Watch","treino ("+((STATE.fontes||{})["Apple Watch (treino)"]||0)+" registros)");
+  h.appendChild(el("p",null,"Hoje os dados entram por export. A conexão automática (Oura via API) é o próximo passo — aí o app atualiza sozinho após cada sincronização do anel."));
+});}
+function sheetRelatorio(){openSheet("Relatório do Signal Test",h=>{
+  (STATE.limitacoes||[]).forEach(l=>{const p=el("p",null,"• "+l);p.style.margin="8px 0 0";h.appendChild(p);});
+  h.appendChild(el("p",null,"Nenhuma hipótese replicou ainda (base curta) — por isso as recomendações aparecem como “coletando”, não como fato. O método completo está no repositório."));
+});}
+function sheetIntegracoes(){openSheet("Integrações",h=>{
+  line(h,"Oura","conectada (export)");
+  line(h,"Apple Watch","treino (export)");
+  line(h,"Automático (tempo quase real)","próximo passo");
+  const est=(STATE.capacidades||[]).find(c=>c.key==="estresse");
+  if(est)h.appendChild(el("p",null,est.mensagem));
+});}
+function sheetSobre(){openSheet("Sobre o Health Twin",h=>{
+  h.appendChild(el("p",null,"Um cérebro longitudinal que aprende os seus padrões e diz o que importa — com honestidade acima de tudo."));
+  h.appendChild(el("p",null,"• Sem número único de prontidão (o estado é instável demais pra virar um “score”)."));
+  h.appendChild(el("p",null,"• Só fala quando os dados aguentam; senão, mostra quanto falta."));
+  h.appendChild(el("p",null,"• Detecta desvio do seu normal, mas não diagnostica doença. Isso é com o médico."));
+});}
+
 /* ---- util ---- */
 function fmtDate(d){if(!d)return"";const[y,m,day]=d.split("-");const M=["jan","fev","mar","abr","mai","jun","jul","ago","set","out","nov","dez"];return`${+day} ${M[+m-1]} ${y}`;}
 function getCss(v){return getComputedStyle(document.documentElement).getPropertyValue(v).trim();}
@@ -274,6 +364,7 @@ async function refresh(){
 (async function(){
   STATE=await fetchState();
   if(!STATE){document.getElementById("view").innerHTML='<div class="card">Sem dados. Rode o servidor: <code>python3 backend/server.py</code>.</div>';return;}
+  buildChrome();
   document.getElementById("prov").innerHTML=`<span class="live-dot"></span>${STATE.fonte_primaria} · ${STATE.n_noites} noites`;
   setTab("hoje");
   setInterval(refresh,60000); // atualiza sozinho conforme novos dados chegam
