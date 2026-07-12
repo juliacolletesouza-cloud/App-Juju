@@ -1,0 +1,5 @@
+dados/oura/
+dados/apple_health/
+*.xml
+*.zip
+exportar*
