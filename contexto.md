@@ -18,23 +18,17 @@
 | Início | Fim | Fonte |
 |---|---|---|
 | 2025-12-10 | 2025-12-14 | informado |
-| 2025-12-21 | 2025-12-26 | informado ⚠️ |
+| 2025-12-21 | 2025-12-26 | informado (dois ciclos em dez — CONFIRMADO por Julia) |
 | 2026-01-04 | 2026-01-08 | informado |
 | 2026-02-19 | 2026-02-22 | informado |
 | 2026-06-15 | 2026-06-19 | informado (última) |
 
-**⚠️ Sinalização de qualidade (NÃO é interpretação clínica):** para a covariável
-H6 (ciclo → HRV) funcionar, os limites do ciclo precisam estar corretos. Os
-intervalos entre INÍCIOS destas datas são atípicos para ciclos:
-- 10/dez → 21/dez = **11 dias**
-- 21/dez → 04/jan = **14 dias**
-- 04/jan → 19/fev = **46 dias**
-- 19/fev → 15/jun = **116 dias**
-
-As duas de dezembro (10-14 e 21-26) estão a ~11 dias uma da outra — curto demais
-para serem dois ciclos. Provável erro de digitação (uma delas talvez seja de
-outro mês). **Precisa confirmar** antes de usar como covariável. Registrado como
-veio; sinalizado como suspeito.
+**Característica do dado (NÃO é interpretação clínica — isso é assunto de médico,
+não deste teste):** os intervalos entre INÍCIOS são muito variáveis —
+11 → 14 → 46 → 116 dias. Ou seja, **ciclos irregulares**. Implicação de MÉTODO
+para H6: a "fase do ciclo" tem que ser derivada das **datas reais** informadas,
+**nunca** de um modelo fixo de 28 dias (que mentiria aqui). Datas confirmadas
+pela Julia; usar como limites empíricos.
 
 **Cobertura vs. dados fisiológicos:** nenhuma destas datas cai na janela do Apple
 Watch 2024 → H6 continua **não testável no teste retrospectivo**. A de 15-19/jun
