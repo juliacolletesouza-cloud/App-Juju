@@ -125,6 +125,35 @@ def compute(nights, workouts=None, events=None, today=None):
         timeline.append({"date": e["date"], "tipo": e.get("kind", "evento"), **e})
     timeline.sort(key=lambda x: x["date"])
     caps = _readiness(n, today)
+    rec_cap = next((c for c in caps if c["key"] == "recomendacoes"), {})
+
+    # ---- DICAS: o que fazer no dia, SEM inventar ----
+    reg = round(st.pstdev([m for m in bmin if m is not None]), 0) if len([m for m in bmin if m is not None]) > 2 else None
+    dicas = {
+        "experimento": {
+            "titulo": "Âncora de horário de dormir",
+            "acao": "Deitar entre 23:00 e 23:30 hoje.",
+            "janela": "23:00–23:30",
+            "porque": (f"É o único ajuste que estamos testando agora (3 semanas). Seu meio-do-sono "
+                       f"varia ±{int(reg)} min" if reg else "É o único ajuste que estamos testando agora (3 semanas)")
+                      + " — regularizar o horário é a alavanca mais defensável com os dados de hoje.",
+            "rotulo": "experimento em teste — não é um fato provado sobre você",
+        },
+        "personalizadas": {
+            "status": rec_cap.get("status", "coletando"),
+            "mensagem": rec_cap.get("mensagem", ""),
+            "eta": rec_cap.get("eta"),
+            "explicacao": "Dicas do dia baseadas nas SUAS associações só quando elas replicarem. "
+                          "Recomendar agora seria inventar — e isso a gente não faz.",
+        },
+        "gerais": [
+            {"t": "Luz natural logo cedo", "d": "Alguns minutos de luz de manhã ajudam a ancorar o relógio circadiano."},
+            {"t": "Cafeína até o começo da tarde", "d": "Evitar café/estimulantes no fim do dia tende a proteger o sono."},
+            {"t": "Desacelerar 30–60 min antes de deitar", "d": "Menos tela e luz forte na última hora facilita adormecer."},
+            {"t": "Horários parecidos nos dias", "d": "Deitar e acordar em horários próximos estabiliza o sono na semana."},
+        ],
+        "gerais_nota": "Higiene do sono geral — vale pra quase todo mundo e NÃO vem dos seus dados. Não é conselho clínico.",
+    }
 
     return {
         "gerado_em": datetime.now().strftime("%Y-%m-%d %H:%M"),
@@ -140,6 +169,7 @@ def compute(nights, workouts=None, events=None, today=None):
             "regularidade_midsleep_min": round(st.pstdev([m for m in bmin if m is not None]), 0) if len([m for m in bmin if m is not None]) > 2 else None,
         },
         "capacidades": caps,
+        "dicas": dicas,
         "timeline": timeline,
         "limitacoes": [
             "n=1 não generaliza.",

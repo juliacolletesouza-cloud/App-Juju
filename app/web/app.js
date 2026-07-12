@@ -133,6 +133,47 @@ function renderHoje(){
   v.appendChild(cap);
 }
 
+/* ---- DICAS ---- */
+function renderDicas(){
+  const v=document.getElementById("view");v.innerHTML="";v.className="fade";
+  const d=STATE.dicas;
+  if(!d){v.appendChild(el("div","card","Sem dicas ainda."));return;}
+
+  // 1) experimento ativo — a acao real de hoje
+  const ex=d.experimento;const c1=el("div","card");
+  c1.appendChild(el("div","eyebrow","Hoje, faça isto"));
+  c1.appendChild(el("h2",ex.titulo));
+  const act=el("div","action");act.appendChild(el("div","ic","✓"));
+  act.appendChild(el("div","txt",`<b>${ex.acao}</b>`));c1.appendChild(act);
+  const tagline=el("div","muted");tagline.style.marginTop="10px";tagline.innerHTML=`<span class="tag">${ex.rotulo}</span>`;c1.appendChild(tagline);
+  const why=el("details","why");why.appendChild(el("summary",null,"Por que só isto?"));
+  why.appendChild(el("p",null,ex.porque));c1.appendChild(why);
+  v.appendChild(c1);
+
+  // 2) dicas personalizadas — coletando (honesto)
+  const p=d.personalizadas;const c2=el("div","card");
+  c2.appendChild(el("div","eyebrow","Dicas personalizadas"));
+  const row=el("div","cap");
+  const r=el("div","ring",`<span>${p.eta?"⏳":"—"}</span>`);r.style.setProperty("--p",0);row.appendChild(r);
+  const body=el("div","body");
+  body.appendChild(el("div","cname", p.status==="pronto"?"Prontas":"Ainda coletando"));
+  body.appendChild(el("div","cmsg", p.status==="pronto"? p.explicacao : (p.mensagem||"")));
+  row.appendChild(body);row.appendChild(el("div",`badge ${p.status}`,p.status));
+  c2.appendChild(row);
+  c2.appendChild(el("p","muted",p.explicacao));
+  v.appendChild(c2);
+
+  // 3) dicas gerais — claramente NAO personalizadas
+  const c3=el("div","card");
+  c3.appendChild(el("div","eyebrow","Dicas gerais"));
+  c3.appendChild(el("h2","Higiene do sono"));
+  c3.appendChild(el("p","sub",d.gerais_nota));
+  d.gerais.forEach(g=>{const it=el("div","substate");
+    it.appendChild(el("div","name",g.t));
+    it.appendChild(el("div","muted",g.d));c3.appendChild(it);});
+  v.appendChild(c3);
+}
+
 /* ---- HISTORIA ---- */
 function renderHistoria(){
   const v=document.getElementById("view");v.innerHTML="";v.className="fade";
@@ -199,7 +240,7 @@ function answer(q){
 function fmtDate(d){if(!d)return"";const[y,m,day]=d.split("-");const M=["jan","fev","mar","abr","mai","jun","jul","ago","set","out","nov","dez"];return`${+day} ${M[+m-1]} ${y}`;}
 function getCss(v){return getComputedStyle(document.documentElement).getPropertyValue(v).trim();}
 function setTab(name){TAB=name;document.querySelectorAll(".tabs button").forEach(b=>b.classList.toggle("active",b.dataset.tab===name));
-  ({hoje:renderHoje,historia:renderHistoria,perguntar:renderPerguntar})[name]();}
+  ({hoje:renderHoje,dicas:renderDicas,historia:renderHistoria,perguntar:renderPerguntar})[name]();}
 document.querySelectorAll(".tabs button").forEach(b=>b.onclick=()=>setTab(b.dataset.tab));
 
 async function refresh(){
