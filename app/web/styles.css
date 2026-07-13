@@ -234,3 +234,6 @@ h2{font-size:17px;margin:0 0 3px;font-weight:450;letter-spacing:-.2px}
   font-size:12px;padding:7px 13px;border-radius:999px;cursor:pointer;white-space:nowrap}
 .dev-btn.on{border-color:color-mix(in srgb,var(--b4) 55%,var(--line));color:var(--b4);
   background:color-mix(in srgb,var(--b4) 12%,transparent)}
+
+.dev-status{font-size:11px;color:var(--muted);margin-top:4px;display:inline-block;
+  background:color-mix(in srgb,var(--muted) 12%,transparent);padding:2px 8px;border-radius:999px}

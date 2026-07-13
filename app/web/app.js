@@ -357,18 +357,19 @@ function sheetPerfil(){openSheet("Perfil e conta",h=>{
 });}
 
 function sheetDispositivos(){openSheet("Emparelhar dispositivos",h=>{
-  h.appendChild(el("p","sub","Conecte seus aparelhos para os dados entrarem sozinhos."));
-  devRow(h,"disp","Oura Ring","recuperação, sono, HRV, temperatura","conectado");
-  devRow(h,"coracao","Apple Watch","treino e atividade","conectado");
-  devRow(h,"pilula","Balança / outros","peso e composição","emparelhar");
-  h.appendChild(el("p",null,"A conexão em tempo quase real (Oura via API) é o próximo passo: depois de emparelhar, o app atualiza sozinho após cada sincronização do anel."));
+  h.appendChild(el("p","sub","Hoje os dados entram por <b>export manual</b>. A conexão automática (Oura via API) ainda não está ligada — é o próximo passo."));
+  devRow(h,"disp","Oura Ring","recuperação, sono, HRV, temperatura","via export","conectar");
+  devRow(h,"coracao","Apple Watch","treino e atividade","via export","conectar");
+  devRow(h,"pilula","Balança / outros","peso e composição","não conectado","emparelhar");
+  h.appendChild(el("p",null,"Quando ligarmos a conexão automática, o app passa a atualizar sozinho ~30s após cada sincronização do anel — sem você exportar nada."));
 });}
-function devRow(host,ic,nome,desc,estado){
+function devRow(host,ic,nome,desc,status,acao){
   const r=el("div","dev");
   r.innerHTML=`<div class="dev-ic">${svg(ICON[ic])}</div>
-    <div class="dev-body"><div class="dev-nome">${nome}</div><div class="dev-desc">${desc}</div></div>`;
-  const btn=el("button","dev-btn "+(estado==="conectado"?"on":""),estado==="conectado"?"conectado":"emparelhar");
-  btn.onclick=()=>{ if(estado!=="conectado") toast("Emparelhamento automático entra com a conexão via API — próximo passo."); };
+    <div class="dev-body"><div class="dev-nome">${nome}</div><div class="dev-desc">${desc}</div>
+      <div class="dev-status">${status}</div></div>`;
+  const btn=el("button","dev-btn",acao);
+  btn.onclick=()=>toast("Conexão automática (Oura via API) é o próximo passo — precisa hospedar o servidor e o seu token.");
   r.appendChild(btn);host.appendChild(r);
 }
 function sheetRelatorio(){openSheet("Relatório do Signal Test",h=>{
